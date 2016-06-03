@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0" />
+    <title>Shooting Shit</title>
+    <!-- CSS  -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <style type="text/css">
+    body {
+        min-height: 100%;
+    }
+    </style>
+</head>
+
+<body>
+    <form>
+        <div class="input-field">
+            <input id="search" type="search">
+            <label for="search"><i>search</i></label>
+            <i onclick="clearSearch()">close</i>
+        </div>
+    </form>
+    <div class="container">
+        <h2>Total Games Played by Group</h2>
+        <div class="row">
+            {% for pair, total in total_games.iteritems() %}
+            <div class="col-md-12">
+                <h3>{% for player in pair %} {{player}}, {% endfor %}</h3>
+                <p>{{ total | int }}</p>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="row">
+            <h2>Champions Played by Group</h2> {% for pair, champs in champs_played.iteritems() %}
+            <div class="col-md-12">
+                <h3>{% for player in pair %}{{player}}, {% endfor %}</h3> {% for player, champs in champs.iteritems() %}
+                <span>{{player}}</span>
+                <table class="table table-striped table-condensed">
+                    <thead>
+                        <th>Name</th>
+                        <th>Times Played</th>
+                    </thead>
+                    <tbody>
+                        {% for champ, number in champs.iteritems() %}
+                        <tr>
+                            <td>{{champ}}</td>
+                            <td>{{number}}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+        <h2>Statistics by Group</h2> {% for pair, stats in averages.iteritems() %}
+        <div class="row">
+            <h3>{% for player in pair %}{{player}}, {% endfor %}</h3> {% for pname, stat in stats.iteritems() %}
+            <p>{{pname}}</p>
+            <table class="table table-striped table-condensed">
+                <thead>
+                    {% for name, number in stat.iteritems() %}
+                    <th>{{name}}</th>
+                    {% endfor %}
+                </thead>
+                <tbody>
+                    <tr>
+                        {% for name, number in stat.iteritems() %}
+                        <td>{{number}}</td>
+                        {% endfor %}
+                    </tr>
+                </tbody>
+            </table>
+            <hr> {% endfor %}
+        </div>
+        {% endfor %}
+    </div>
+    <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script type="text/javascript">
+    $('input#search').bind('keypress', function(e) {
+        // Escape.
+        if (e.keyCode === 27) {
+            clearSearch();
+            return;
+        } else if (e.keyCode === 13) {
+            // enter
+            var val = document.getElementById('search').value;
+            window.location.href = "/search?query=" + val;
+            return false;
+        }
+    });
+
+    function clearSearch() {
+        $('input#search').val('');
+        $('input#search').blur();
+    }
+    </script>
+</body>
+
+</html>
