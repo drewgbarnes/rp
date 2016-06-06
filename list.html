@@ -15,27 +15,45 @@
 </head>
 
 <body>
-    <form>
+
+<!--     <form>
         <div class="input-field">
             <input id="search" type="search">
             <label for="search"><i>search</i></label>
             <i onclick="clearSearch()">close</i>
         </div>
-    </form>
+    </form> -->
     <div class="container">
-        <h2>Total Games Played by Group</h2>
+    <h1>LOL</h1>
+    <hr>
+        <h2>Games Played by Group</h2>
+        {% for pair, stats in total_games.iteritems() %}
         <div class="row">
-            {% for pair, total in total_games.iteritems() %}
-            <div class="col-md-12">
-                <h3>{% for player in pair %} {{player}}, {% endfor %}</h3>
-                <p>{{ total | int }}</p>
-            </div>
-            {% endfor %}
+            <table class="table table-striped table-condensed">
+                <thead>
+                    <th class="col-md-4">Group</th>
+                    {% for name, number in stats.iteritems() %}
+                    <th class="col-md-2">{{name}}</th>
+                    {% endfor %}
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="col-md-4">{% for player in pair %}{{player}}, {% endfor %}</td>
+                        {% for name, number in stats.iteritems() %}
+                        <td class="col-md-2">{{number}}</td>
+                        {% endfor %}
+                    </tr>
+                </tbody>
+            </table>
+            
         </div>
+        {% endfor %}
         <div class="row">
-            <h2>Champions Played by Group</h2> {% for pair, champs in champs_played.iteritems() %}
-            <div class="col-md-12">
-                <h3>{% for player in pair %}{{player}}, {% endfor %}</h3> {% for player, champs in champs.iteritems() %}
+            <h2>Champions Played by Group</h2> 
+            {% for pair, champs in champs_played.iteritems() %}
+            <div class="col-md-3">
+                <h3>{% for player in pair %}{{player}}, {% endfor %}</h3> 
+                {% for player, champs in champs.iteritems() %}
                 <span>{{player}}</span>
                 <table class="table table-striped table-condensed">
                     <thead>
@@ -55,25 +73,31 @@
             </div>
             {% endfor %}
         </div>
-        <h2>Statistics by Group</h2> {% for pair, stats in averages.iteritems() %}
+        <h2>Statistics by Group</h2>
+        {% for pair, stats in averages.iteritems() %}
         <div class="row">
-            <h3>{% for player in pair %}{{player}}, {% endfor %}</h3> {% for pname, stat in stats.iteritems() %}
-            <p>{{pname}}</p>
+            <h3>{% for player in pair %}{{player}}, {% endfor %}</h3> 
+            
             <table class="table table-striped table-condensed">
+                {% for pname, stat in stats.iteritems() %}
+                {% if loop.first %}
                 <thead>
+                    <th>Name</th>
                     {% for name, number in stat.iteritems() %}
                     <th>{{name}}</th>
                     {% endfor %}
                 </thead>
+                {% endif %}
                 <tbody>
                     <tr>
+                        <td>{{pname}}</td>
                         {% for name, number in stat.iteritems() %}
-                        <td>{{number}}</td>
+                        <td class="text-right">{{number}}</td>
                         {% endfor %}
                     </tr>
                 </tbody>
+                {% endfor %}
             </table>
-            <hr> {% endfor %}
         </div>
         {% endfor %}
     </div>
