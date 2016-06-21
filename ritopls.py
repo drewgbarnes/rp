@@ -1,4 +1,3 @@
-#ef31dc19-b206-4753-8029-acc73903d5f5
 #mehabahaha
 #41938767
 
@@ -18,6 +17,13 @@
 
 import requests, json, time, itertools, collections, ast, datetime
 
+from pymongo import MongoClient, errors
+
+
+client = MongoClient()
+db = client['test']
+matches_collection = db['rito_matches']
+stats_collection = db['rito_stats']
 
 def convert(data):
     if isinstance(data, basestring):
@@ -55,8 +61,7 @@ def rito_pls(endpoint, params='', query='?', static=False):
 	return resp.json()
 
 def get_champion(champion_id):
-	champion = rito_pls('v1.2/champion/', champion_id, '?champData=all&', True)
-	return champion
+	return rito_pls('v1.2/champion/', champion_id, '?champData=all&', True)
 
 def get_summoners(summoner_ids_or_names):
 	if type(summoner_ids_or_names) == list:
@@ -71,12 +76,10 @@ def get_summoners(summoner_ids_or_names):
 		return rito_pls('v1.4/summoner/', summoner_id_or_name)
 
 def get_matchlist(summoner_id):
-	matchlist = rito_pls('v2.2/matchlist/by-summoner/', summoner_id)
-	return matchlist
+	return rito_pls('v2.2/matchlist/by-summoner/', summoner_id)
 
 def get_match(match_id):
-	match = rito_pls('v2.2/match/', match_id)
-	return match
+	return rito_pls('v2.2/match/', match_id)
 
 def get_one_matchlist(summs, name):
 	for summ in summs:
@@ -127,6 +130,9 @@ def run():
 
 	matches_to_players = {}
 	for match in matches:
+
+		matches_collection.update_one({'mid': match}, {'$set': {"mid": match, "i": matches[match]}}, upsert=True)
+
 		match_people = matches[match]['participantIdentities']	
 		match_usernames = []
 		for person in match_people:
@@ -152,20 +158,20 @@ def run():
 					averages[pair][summ][stat] = 0
 
 	known_champs = {}
-	nprocessed = 0
+	processed = 0
 	oldest_game_id = matches_to_players.keys()[0]
 	for mid in matches:
-		print('processing match %d' % nprocessed)
-		nprocessed += 1
+		print('processing match %d' % processed)
+		processed += 1
 		names = []
 		for player in matches_to_players[mid]:
 			names.append(player[0])
 		pair = tuple(sorted(names))
 		total_games[pair]['total'] += 1
 		total_games[pair]['durations'] += matches[mid]['matchDuration']
-		date = datetime.datetime.fromtimestamp(matches[mid]['matchCreation']/1000.0)
+		date = datetime.datetime.fromtimestamp(matches[mid]['matchCreation'] / 1000.0)
 		
-		if date < datetime.datetime.fromtimestamp(matches[oldest_game_id]['matchCreation']/1000.0):
+		if date < datetime.datetime.fromtimestamp(matches[oldest_game_id]['matchCreation'] / 1000.0):
 			oldest_game_id = mid
 
 		checkwin = False
